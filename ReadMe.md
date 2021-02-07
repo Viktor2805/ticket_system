@@ -1,8 +1,8 @@
-# ticket_system
+## ticket_system
 
-# how to run application 
+## how to run application 
 ## docker-compose up ---- in terminal
-# http://localhost/
+##  http://localhost/
 
 
 
