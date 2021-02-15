@@ -1,8 +1,5 @@
 {
     "require": {
-        "guzzlehttp/guzzle": "^7.2",
-        "zendesk/zendesk_api_client_php": "^2.2",
-        "ext-gd": "*",
-        "phpoffice/phpspreadsheet": "^1.16"
+        "guzzlehttp/guzzle": "^7.2"
     }
 }
