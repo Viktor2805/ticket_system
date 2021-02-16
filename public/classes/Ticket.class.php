@@ -1,7 +1,6 @@
 <?php 
 class Ticket {
 
-    // insertCheckPropsInFile
     public function convertJsonToCsv($json_filename, $csv_filename) {
        if (($json = file_get_contents($json_filename)) == false)
         die('Error reading json file...');

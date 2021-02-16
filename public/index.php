@@ -1,43 +1,97 @@
 <?php
 
+require_once './includes/autoloader.inc.php';
 require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 $client = new Client();
-require_once './includes/autoloader.inc.php';
 
-
-abstract class GetByApi {
-    private $url = 'https://shipweb.zendesk.com';
-    private $auth = ['auth' => ['maks.shtieklia@gmail.com', 'Rikoriko955']];
+class Freshdesk {
+    private $url = 'https://newaccount1613401321771.freshdesk.com/api/v2/';
+    private $auth = ['auth' => ["thPbFfHTZFJxgcZzYMng", "12"]];
 
     public function get($api) {
         $client = new Client();
         $response = $client->request('GET', $this->url.$api, $this->auth);
 
-        $tickets = json_decode($response->getBody());
-        return $tickets;
+        $response = json_decode($response->getBody());
+        return $response;
+    }
+
+    public function getContactsData($apiPrefix) {
+        $contactsData = $this->get($apiPrefix);
+        foreach ($contactsData as $value) {
+             echo "<pre>";print_r($value->name);"</pre>";
+            echo "<pre>";print_r($value->email);"</pre>";
+        }
+        return $contactsData;
+    }
+
+    public function getTicketsData($apiPrefix) {
+        $ticketsData = $this->get($apiPrefix);
+        foreach ($ticketsData as $value) {
+            echo "<pre>";print_r($value->name);"</pre>";
+            echo "<pre>";print_r($value->email);"</pre>";
+        }
+        return $ticketsData;
+    }
+
+    public function getAgentsData($apiPrefix) {
+        $agentsData = $this->get($apiPrefix);
+        foreach ($agentsData as $value) {
+            echo "<pre>";print_r($value->name);"</pre>";
+            echo "<pre>";print_r($value->email);"</pre>";
+        }
+        return $agentsData;
     }
 }
 
-$page = "contacts";
-$url = 'https://newaccount1613401321771.freshdesk.com/api/v2/'.$page;
-$response = $client->request("GET", $url, ['auth' => ["thPbFfHTZFJxgcZzYMng", "12"]]);
+
+
+
+
+
+
+class GetData {
+    public function getData() {
+        $data = [];
+        $freshdesk = new Freshdesk();
+
+        print_r($freshdesk->pushInCsv("tickets"));
+
+    }
+
+}
+
+$getData = new GetData();
+
+$getData->getData("tickets");
 
 $listOfmainProperties = [
     "id","description","status","priority","group_id","organization_id","recipient",
     "submitter_id","brand_id","created_at","updated_at","status","company_id"
 ];
 
-$ticket = new Ticket();
-$tickets = json_decode($response->getBody(), true);
 
-$ticketProps = $ticket->getTicketProperties($tickets);
-$ticketsJson = $ticket->ticketPropsToJson($page, $tickets,["name","email"]);
+$apiPrefix = ["contacts" => "contacts", "tickets" => "tickets", "agents" => "agents"];
 
-echo" <pre>";print_r($tickets);"</pre>";
+//$freshdesk->pushContactsInCsv($apiPrefix["contacts"]);
+
+//echo" <pre>";print_r($freshdesk->pushContactsInCsv($apiPrefix["agents"]));"</pre>";
 
 
-$ticket->convertJsonToCsv("headers.json",'headers.csv');
+
+
+
+//$ticket = new Ticket();
+//$tickets = json_decode($response->getBody(), true);
+
+//$ticketProps = $ticket->getTicketProperties($tickets);
+//$ticketsJson = $ticket->ticketPropsToJson($page, $tickets,["name","email"]);
+
+//echo" <pre>";print_r($tickets);"</pre>";
+
+
+//$ticket->convertJsonToCsv("headers.json",'headers.csv');
 
 
 
