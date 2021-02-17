@@ -139,15 +139,14 @@ class Freshdesk {
             "group_name",
         ];
 
-//        $this->getCustomFields();
-
         foreach ($ticketsData as $value ) {
-            $group_name =  $this->getGroupByID("$value->group_id")["name"];
-            $agent_name =  $this->getAgentByID("$value->responder_id")["name"];
-            $agent_email =  $this->getAgentByID("$value->responder_id")["email"];
-            $company_name =  $this->getCompanyByID("$value->company_id")["name"];
-            $contact_name = $this->getContactByID("$value->requester_id")["name"];
-            $contact_email = $this->getContactByID("$value->requester_id")["email"];
+            $group_name =  $this->getGroupByID($value->group_id)["name"];
+            $agent =  $this->getAgentByID($value->responder_id);
+            $company_name =  $this->getCompanyByID($value->company_id)["name"];
+            $contact_name = $this->getContactByID($value->requester_id)["name"];
+
+            $contact = $this->getContactByID($value->requester_id);
+
             $data[] = [
                 $value->id,
                 $value->subject,
@@ -157,12 +156,12 @@ class Freshdesk {
                 $value->created_at,
 
                 $value->requester_id,
-                $contact_name,
-                $contact_email,
+                $contact["name"],
+                $contact["email"],
 
                 $value->responder_id,
-                $agent_name,
-                $agent_email,
+                $agent["name"],
+                $agent["email"],
 
                 $value->company_id,
                 $company_name,
@@ -172,7 +171,6 @@ class Freshdesk {
             ];
         }
 
-//        echo "<pre>";print_r($data);"</pre>";
         return $data;
     }
 
@@ -193,11 +191,13 @@ try {
         $tickets = $freshdesk->getData($api);
         $freshdesk->pushToCsv($tickets);
     }
-
+    $api = "company_id=".$_POST["company_id"];
+    $tickets = $freshdesk->getData($api);
 } catch (Exception $e) {
     $api = "updated_since=".$_POST["date"];
-    $tickets = $freshdesk->getData($api);
-
+    if (isset($_POST["date"])) {
+        $tickets = $freshdesk->getData($api);
+    }
     if (isset($tickets )) {
         $freshdesk->pushToCsv($tickets);
     }
