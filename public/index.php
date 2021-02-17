@@ -72,8 +72,9 @@ class Freshdesk {
 
     public function getCompanyByID($id) {
         if(!empty($id)) {
-            $company = $this->get('tickets?company_id=' . $id );
-            echo "<pre>";print_r($company);"</pre>";
+            $company = $this->get('companies/' . $id );
+            $name = $company->name;
+
         } else {
             $name = NULL;
         }
@@ -86,7 +87,7 @@ class Freshdesk {
     public function getTicketsByDate($date) {
         if(!empty($id)) {
 
-            $company = $this->get('tickets/' . $date );
+            $company = $this->get('companies/' . $date );
             $name = $company->name;
         } else {
             $name = NULL;
@@ -119,6 +120,9 @@ class Freshdesk {
             "ticket_subject",
             "ticket_status",
             "ticket_priority",
+            "ticket_updated_at",
+            "ticket_created_at",
+
 
             "contact_id",
             "contact_name",
@@ -135,7 +139,7 @@ class Freshdesk {
             "group_name",
         ];
 
-        $this->getCustomFields();
+//        $this->getCustomFields();
 
         foreach ($ticketsData as $value ) {
             $group_name =  $this->getGroupByID("$value->group_id")["name"];
@@ -144,12 +148,13 @@ class Freshdesk {
             $company_name =  $this->getCompanyByID("$value->company_id")["name"];
             $contact_name = $this->getContactByID("$value->requester_id")["name"];
             $contact_email = $this->getContactByID("$value->requester_id")["email"];
-
             $data[] = [
                 $value->id,
                 $value->subject,
                 $value->status,
                 $value->priority,
+                $value->updated_at,
+                $value->created_at,
 
                 $value->requester_id,
                 $contact_name,
@@ -183,9 +188,9 @@ class Freshdesk {
 $freshdesk = new Freshdesk();
 
 try {
-    $api = "company_id=".$_POST["company_id"]."&"."updated_since=".$_POST["date"];
-    $tickets = $freshdesk->getData($api);
-    if (isset($tickets )) {
+    if (isset($_POST["company_id"]) && isset($_POST["date"])) {
+        $api = "company_id=".$_POST["company_id"]."&"."updated_since=".$_POST["date"];
+        $tickets = $freshdesk->getData($api);
         $freshdesk->pushToCsv($tickets);
     }
 
@@ -197,6 +202,7 @@ try {
         $freshdesk->pushToCsv($tickets);
     }
 }
+
 
 
 
