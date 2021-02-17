@@ -72,8 +72,21 @@ class Freshdesk {
 
     public function getCompanyByID($id) {
         if(!empty($id)) {
+            $company = $this->get('tickets?company_id=' . $id );
+            echo "<pre>";print_r($company);"</pre>";
+        } else {
+            $name = NULL;
+        }
 
-            $company = $this->get('companies/' . $id );
+        return [
+            'name' => $name,
+        ];
+    }
+
+    public function getTicketsByDate($date) {
+        if(!empty($id)) {
+
+            $company = $this->get('tickets/' . $date );
             $name = $company->name;
         } else {
             $name = NULL;
@@ -98,7 +111,8 @@ class Freshdesk {
     }
 
     public function getData($id) {
-        $ticketsData = $this->get("tickets");
+        $ticketsData = $this->
+        get("tickets?".$id);
 
         $data[] = [
             "ticket_id",
@@ -116,7 +130,6 @@ class Freshdesk {
 
             "company_id",
             "company_name",
-
 
             'group_id',
             "group_name",
@@ -167,6 +180,24 @@ class Freshdesk {
     }
 }
 
-$getData = new Freshdesk();
-$customFields = $getData->getCustomFields();
-$csvData = $getData->pushToCsv($customFields);
+$freshdesk = new Freshdesk();
+
+try {
+    $api = "company_id=".$_POST["company_id"]."&"."updated_since=".$_POST["date"];
+    $tickets = $freshdesk->getData($api);
+    if (isset($tickets )) {
+        $freshdesk->pushToCsv($tickets);
+    }
+
+} catch (Exception $e) {
+    $api = "updated_since=".$_POST["date"];
+    $tickets = $freshdesk->getData($api);
+
+    if (isset($tickets )) {
+        $freshdesk->pushToCsv($tickets);
+    }
+}
+
+
+
+
