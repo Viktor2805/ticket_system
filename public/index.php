@@ -84,34 +84,22 @@ class Freshdesk {
         ];
     }
 
-    public function getCustomFields($id) {
-        if(!empty($id)) {
-            $ticketField = $this->get('tickets/' . $id );
-            $custom_fields = $ticketField->custom_fields;
+    public function getCustomFields() {
+            $ticketField = $this->get('tickets/');
 
-            foreach ($custom_fields as $key => $field) {
-                $fieldsKeys[] = $key;
-                $fieldsValues[] = $field;
-
+            foreach ($ticketField as $key => $field) {
+                foreach ($field->custom_fields as $key => $prop) {
+                    $fieldsKeys[] = $key;
+                    $fieldsValues[] = $prop;
+                }
             }
 
-            $fp = fopen('custom_fields.csv', 'w');
-            foreach ([$fieldsKeys,$fieldsValues] as $fields) {
-                fputcsv($fp, $fields);
-            }
-            fclose($fp);
-        } else {
-            $custom_fields = NULL;
-        }
-
-        return $arrFields;
+        return [$fieldsKeys,$fieldsValues];
     }
 
     public function getData($id) {
         $ticketsData = $this->get("tickets");
-        $ticket_Fiedls = $this->get("tickets/15");
 
-//?company_id=".$id;
         $data[] = [
             "ticket_id",
             "ticket_subject",
@@ -134,9 +122,7 @@ class Freshdesk {
             "group_name",
         ];
 
-//        echo "<pre>";print_r($contact_email);"</pre>";
-//                foreach ($ticket_Fiedls->custom_fields)
-        $this->getCustomFields("1");
+        $this->getCustomFields();
 
         foreach ($ticketsData as $value ) {
             $group_name =  $this->getGroupByID("$value->group_id")["name"];
@@ -145,10 +131,6 @@ class Freshdesk {
             $company_name =  $this->getCompanyByID("$value->company_id")["name"];
             $contact_name = $this->getContactByID("$value->requester_id")["name"];
             $contact_email = $this->getContactByID("$value->requester_id")["email"];
-
-//            $contact_email = $this->getContactByID("$value->requester_id")["cu"];
-
-
 
             $data[] = [
                 $value->id,
@@ -173,12 +155,11 @@ class Freshdesk {
         }
 
 //        echo "<pre>";print_r($data);"</pre>";
-
         return $data;
     }
 
     public function pushToCsv($data) {
-        $fp = fopen('persons.csv', 'w');
+        $fp = fopen('headers.csv', 'w');
         foreach ($data as $fields) {
             fputcsv($fp, $fields);
         }
@@ -186,8 +167,6 @@ class Freshdesk {
     }
 }
 
-
 $getData = new Freshdesk();
-$data = $getData->getData("15");
-
-$csvData = $getData->pushToCsv($data);
+$customFields = $getData->getCustomFields();
+$csvData = $getData->pushToCsv($customFields);
